@@ -43,7 +43,12 @@ jobs:
           set -x
           git clone https://github.com/CRKatri/trustcache
           cd trustcache
-          gmake -j$(sysctl -n hw.physicalcpu) OPENSSL=1
+          # 直接在命令行中定义并传递路径，确保 gmake 能看到它们
+          OPENSSL_PREFIX=$(brew --prefix openssl)
+          gmake -j$(sysctl -n hw.physicalcpu) \
+            OPENSSL=1 \
+            CFLAGS="-I$OPENSSL_PREFIX/include -DOPENSSL -DVERSION=2.0" \
+            LDFLAGS="-L$OPENSSL_PREFIX/lib"
           sudo cp trustcache /opt/procursus/bin/
 
       - name: Set Environment Variables
